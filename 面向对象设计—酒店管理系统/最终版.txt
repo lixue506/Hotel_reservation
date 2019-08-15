@@ -1,0 +1,429 @@
+#include<iostream>
+#include<fstream>
+#include<ostream>
+#include<iomanip>
+#include<cstring>
+#include<string>
+using namespace std;
+int n = 300;//题目中有房间的添加先定义300为现在的客房数量
+class People
+{
+private:
+    string name;
+    string sex;//自己定义
+    int old;//自己定义
+    char id[19];//自己定义，也可以删去，也可以自己加上住房的费用
+    string timestart;//自己定义，也可以删去
+    string timeend;//自己定义，也可以删去
+public:
+
+    void Setold()
+    {
+        old = -1;   //年龄定为负一
+    }
+    void Input(string &Name,string &Sex,int Old,char *Id,string &times,string &timee)//输入客户信息
+    {
+        name = Name;
+        sex = Sex;
+        old = Old;
+        strcpy(id,Id);
+        timestart = times;
+        timeend = timee;
+    }
+    void Showperson()//显示客户的信息
+    {
+        cout<<" 姓  名 :"<<name<<endl;
+        cout<<" 性  别 :"<<sex<<endl;
+        cout<<" 年  龄 :"<<old<<endl;
+        cout<<"证 件 号:"<<id<<endl;
+        cout<<"入住时间:"<<timestart<<endl;
+        cout<<"退订时间:"<<timeend<<endl;
+    }
+    string Getname()
+    {
+        return name;
+    }
+    string Getsex()
+    {
+        return sex;
+    }
+    int Getold()
+    {
+        return old;
+    }
+    char *Getid()
+    {
+        return id;
+    }
+    string Gettimestart()
+    {
+        return timestart;
+    }
+    string Gettimeend()
+    {
+        return timeend;
+    }
+};
+class Room
+{
+private:
+    int number;
+    int grade;
+    string ride;
+    bool flag;//判断是否为空房间。是否有人住
+    bool open;//由于有房间的增加，删除，所以用来判断房间是否用来租住
+public:
+    Room()//析构函数，初始化，初始化的内容，可以乱填
+    {
+        flag = true;
+        open = true;
+    }
+    int Getnumber()
+    {
+        return number;
+    }
+    int Getgrade()
+    {
+        return grade;
+    }
+    string Getride()
+    {
+        return ride;
+    }
+    void Set()//预定
+    {
+        flag = false;
+    }
+    void Clear()//退订
+    {
+        flag = true;
+    }
+    void Noopen()//删除房间
+    {
+        open = false;
+    }
+    void Yesopen()//开放房间
+    {
+        open = true;
+    }
+    void Add_or_Change(int Number,int Grade,string &Ride)//添加或者更改客房信息
+    {
+        number = Number;
+        grade = Grade;
+        ride = Ride;
+    }
+    bool Isempty() //是否可入住
+    {
+        return flag;
+    }
+    bool Isopen()//是否开放
+    {
+        return open;
+    }
+    int Getid()//获得房间号
+    {
+        return number;
+    }
+    void Show()//显示房间信息
+    {
+        cout<<"房间号："<<number<<endl;
+        if(!Isopen())
+            cout<<"房间未开放！"<<endl;
+        else
+        {
+            cout<<"等  级："<<grade<<endl;
+            cout<<"内部设施："<<ride<<endl;
+            cout<<"是否可以入住：";
+            if(!Isempty())
+                cout<<"否"<<endl;
+            else
+                cout<<"是"<<endl;
+        }
+    }
+};
+class Hotel
+{
+    People Person[500];
+    Room House[500];
+    int Findfree()//不计算入住人数，只看还有没有空房间可以住；也可以把这个函数放在下面Public里面
+    {
+        for(int i=0; i<n; i++)
+        {
+            if(House[i].Isopen()&&House[i].Isempty())
+                return i;//找到空房间，返回下标
+        }
+        return -1;//为找到空房间
+    }
+public:
+    Hotel()
+    {
+        for(int i=0; i<500; i++)
+        {
+            int Grade = 1;
+            string Ride = "单人间";
+            House[i].Add_or_Change(i,Grade,Ride);
+            Person[i].Setold();
+			if(i>300)
+				House[i].Noopen();
+        }
+    }
+    void room_booking()//预定房间
+    {
+        int t = Findfree();
+        if(t==-1)
+            cout<<"房间已满！"<<endl;
+        else
+        {
+            string Name,Sex,times,timee;
+            int Old;
+            char Id[19];
+            House[t].Set();
+            cout<<"请输入入住人员的姓名、性别、年龄、证件号，入住时间以及退订时间："<<endl;
+            cin>>Name>>Sex>>Old>>Id>>times>>timee;
+            Person[t].Input(Name,Sex,Old,Id,times,timee);
+        }
+    }
+    void room_check()//退订房间
+    {
+        int t;
+        cout<<"请输入要退定的房间号：";
+        cin>>t;
+        if(!House[t].Isopen()||House[t].Isempty())//房间不开放或者无人住，不能退订
+            cout<<"房间不存在！"<<endl;
+        else
+        {
+            House[t].Clear();
+            Person[t].Setold();
+            cout<<"成功退订！"<<endl;
+        }
+    }
+    void room_service()//客房信息
+    {
+        int c;
+        cout<<"**********酒店客房预订系统**********"<<endl;
+        cout<<"              客房信息              "<<endl;
+        cout<<"1, 添加房间                         "<<endl;
+        cout<<"2, 更改房间信息                     "<<endl;
+        cout<<"3, 删除房间信息                     "<<endl;
+        cout<<"4, 查找                             "<<endl;
+        cout<<"5, 显示房间信息                     "<<endl;
+        cout<<"6, 返回上一级菜单                   "<<endl;
+        cout<<"************************************"<<endl;
+        cout<<"请输入1~6选择相应的功能：";
+        while(cin>>c)
+        {
+            if(c==6)
+                return;
+            if(c==5)//以文件的形式储存读取
+            {
+                cout<<"房间号"<<'\t'<<"等级"<<'\t'<<"内部设施"<<endl;
+                for(int i=0; i<n; i++)
+                {
+                    if(House[i].Isopen())
+                        cout<<House[i].Getnumber()<<'\t'<<House[i].Getgrade()<<'\t'<<House[i].Getride()<<endl;
+                }
+                break;
+            }
+            if(c==4)//查询
+            {
+                int t;
+                cout<<"请输入查询的房间号："<<endl;
+                cin>>t;
+                if(House[t].Isopen())
+                {
+                    House[t].Show();
+                }
+                else
+                    cout<<"房间不存在！"<<endl;
+                break;
+            }
+            if(c==3)//删除房间
+            {
+                int t;
+                cout<<"请输入要删除的房间号！"<<endl;
+                cin>>t;
+                if(!House[t].Isempty()||!House[t].Isopen())//有人住或者房间不开放
+                    cout<<"房间删除有误！"<<endl;
+                else
+                {
+                    House[t].Noopen();
+                    cout<<"成功删除！"<<endl;
+                    n--;
+                }
+                break;
+            }
+            if(c==2)//房间信息更改
+            {
+                int Grade,t;
+                string Ride;
+                cout<<"请输入要更改的房间号：";
+                cin>>t;
+                if(t<n&&House[t].Isopen())//非可入住的房间更改信息无意义，也可以不要&&House[t].Isopen()
+                {
+                    cout<<"请输入要更改的房间的等级和内部设施："<<endl;
+                    cin>>Grade>>Ride;//房间号为了简单设为不可更改
+                    House[t].Add_or_Change(t,Grade,Ride);
+                }
+                else
+                    cout<<"房间号不正确！"<<endl;
+                break;
+            }
+            if(c==1)//房间添加
+            {
+                for(int i=0; i<=n; i++)
+                {
+                    if(!House[i].Isopen())
+                    {
+                        House[i].Yesopen();//说明房间可以入住了
+                        cout<<"成功添加！"<<endl;
+						n++;
+                        break;
+                    }
+                }
+                if(n==500)
+                    cout<<"房间已满！"<<endl;
+                break;
+            }
+        }
+    }
+    void customer_information()//客户信息
+    {
+        int c;
+        cout<<"**********酒店客房预订管理系统**********"<<endl;
+        cout<<"                客户信息                "<<endl;
+        cout<<"1, 更改客户信息                         "<<endl;
+        cout<<"2, 查找客户                             "<<endl;
+        cout<<"3, 显示客户信息                         "<<endl;
+        cout<<"4, 返回上一级菜单                       "<<endl;
+        cout<<"****************************************"<<endl;
+        cout<<"请输入1~4选择相应的功能：";
+        while(cin>>c)
+        {
+            if(c==4)//返回
+                return;
+            if(c==3)//以文件的形式储存，读取
+            {
+                cout<<"姓名"<<'\t'<<"性别"<<'\t'<<"年龄"<<'\t'<<"证件号"<<'\t'<<"入住时间"<<'\t'<<"退订时间"<<endl;
+                for(int i=0; i<n; i++)
+                {
+                    if(Person[i].Getold()!=-1)
+                        cout<<Person[i].Getname()<<'\t'<<Person[i].Getsex()<<'\t'<<Person[i].Getold()<<'\t'<<Person[i].Getid()<<'\t'<<Person[i].Gettimestart()<<'\t'<<Person[i].Gettimeend()<<endl;
+                }
+            }
+            break;
+        }
+        if(c==2)//查询
+        {
+            int t,i;
+            cout<<"请输入查询人员的房间号："<<endl;
+            cin>>t;
+            for(i=0; i<n; i++)
+            {
+                if(!House[i].Isempty())
+                {
+                    Person[i].Showperson();
+                    break;
+                }
+            }
+            if(i==n)
+                cout<<"查无此人！"<<endl;
+        }
+        if(c==1)//更该客户信息
+        {
+            int t;
+            cout<<"请输入更改人员的房间号"<<endl;
+            cin>>t;
+            if(House[t].Isopen()&&!House[t].Isempty())
+            {
+                string Name,Sex,times,timee;
+                int Old;
+                char Id[19];
+                cout<<"请输入更改人员的姓名，性别，年龄，证件号，入住时间，退订时间："<<endl;
+                cin>>Name>>Sex>>Old>>Id>>times>>timee;
+                Person[t].Input(Name,Sex,Old,Id,times,timee);
+            }
+            else
+                cout<<"没有此房间无入住人员！"<<endl;
+        }
+    }
+    void saveHouse()//保存文件
+    {
+        ofstream outfile("fname");
+        if(!outfile)
+        {
+            cout<<"文件打开失败！"<<endl;
+            cin.get();
+        }
+        else
+        {
+			int i;
+            outfile<<"房间号"<<'\t'<<"等级"<<'\t'<<"内部设施"<<endl;
+            for(i=0; i<n; i++)
+            {
+                if(House[i].Isopen())
+                {
+                    outfile<<House[i].Getnumber()<<'\t'<<House[i].Getgrade()<<'\t'<<House[i].Getride()<<endl;
+                }
+            }
+            outfile<<"姓名"<<'\t'<<"性别"<<'\t'<<"年龄"<<'\t'<<"身份证号"<<'\t'<<"入住时间"<<'\t'<<"退订时间"<<endl;
+            for(i=0; i<n; i++)
+            {
+                if(Person[i].Getold()!=-1)
+                {
+                    outfile<<Person[i].Getname()<<'\t'<<Person[i].Getsex()<<'\t'<<Person[i].Getold()<<'\t'<<Person[i].Getid()<<'\t'<<Person[i].Gettimestart()<<'\t'<<Person[i].Gettimeend()<<endl;
+                }
+            }
+            outfile.close();
+        }
+    }
+};
+int menu_select()//主界面
+{
+    char c;
+    cout<<"**********酒店客房预订管理系统**********"<<endl;
+    cout<<"1、订 房                                "<<endl;
+    cout<<"2、退 订                                "<<endl;
+    cout<<"3、客房信息                             "<<endl;
+    cout<<"4、客户信息                             "<<endl;
+    cout<<"5、退出系统                             "<<endl;
+    cout<<"****************************************"<<endl;
+    cout<<"请输入1~5选择相应的功能："<<endl;
+    do
+    {
+        cin.get(c);
+    }
+    while(c<'1'||c>'5');
+    return c-48;
+};
+int main()
+{
+    char choice;
+    Hotel test;
+    for(;;)
+    {
+        choice = menu_select();
+        switch(choice)
+        {
+        case 1:
+            test.room_booking();
+            break;
+        case 2:
+            test.room_check();
+            break;
+        case 3:
+            test.room_service();
+            break;
+        case 4:
+            test.customer_information();
+            break;
+        case 5:
+        {
+            test.saveHouse();
+            cout<<"客房信息、客户信息储存在 fname 文件中"<<endl;
+            cout<<"请注意储存位置！"<<endl;
+        }
+        return 0;
+        }
+    }
+    return 0;
+}
