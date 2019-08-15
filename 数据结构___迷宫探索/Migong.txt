@@ -1,0 +1,209 @@
+#ifndef MIGONG
+#define MIGONG
+#include"stdlib.h"
+#include<stack>
+#include<queue>
+#include<memory.h>
+class Migong
+{
+private:
+    int start_x;
+    int start_y;//初始点
+    int end_x;
+    int end_y;//终点
+    int n;
+    int m;//控制实际输入数组
+    typedef struct
+    {
+        int x;
+        int y;
+        int direct;
+    }route;
+    int maplab[55][55]; //迷宫图
+    int visit[55][55]; //方阵路径
+public:
+     Migong()//构造函数，初始化
+    {
+     n = 50;
+     m = 50; //数组维数初始化
+     start_x = 1;
+     start_y = 1;//初始点
+     end_x = 50;
+     end_y = 50;//终点
+     for(int i = 1; i <= n; i ++)
+     {
+        for(int j = 1; j <= m; j++)
+            {
+                maplab[i][j] = rand() % 2; //0,1赋值
+                visit[i][j] = 0;
+            }
+     }
+    }
+    bool judge(int x, int y)//判断路径是否越界
+    {
+        if(x >= 1 && x <= n && y >= 1 && y <= m && maplab[x][y] == 1 && visit[x][y] == 0)
+            return true;
+        else
+            return false;
+    }
+    bool Show_route(int flag = 0) //输出路径
+    {
+        memset(visit, 0, sizeof(visit));
+        int dir[][2] = {0,1,1,0,0,-1,-1,0}; //控制方向，0右,1下,2左,3上
+        stack<route>s;
+        route start;
+        start.x = start_x;
+        start.y = start_y;
+        s.push(start);//首元素入栈
+        visit[start_x][start_y] = 1;
+        while( !s.empty() )
+        {
+            route tmp,e;
+            tmp = s.top();
+            s.pop();
+            // 到达终点
+            if(tmp.x == n && tmp.y == m)
+            {
+                stack<route>q;
+                queue<route>p;
+                q.push(tmp);
+                while(!s.empty())
+                {
+                    e = s.top();
+                    s.pop();
+                    q.push(e);
+                }
+                printf("约定，0表示向右，1表示向下，2表示向左，3表示向上。\n");
+                printf("路 径：\n");
+                while( !q.empty() )
+                {
+                    e = q.top();
+                    p.push(e);
+                    q.pop();
+                    printf("( %d, %d, %d )", e.x, e.y, e.direct);
+                }
+                printf("\n");
+                if(flag == 1)
+                {
+                    printf("迷宫路径方阵：\n");
+                    e = p.front();
+                    p.pop();
+                    for(int i = 1; i <= n; i ++)
+                    {
+                        for(int j = 1; j <= m; j ++)
+                        {
+                            if( i == e.x && j == e.y)
+                                {
+                                    printf("1 ");
+                                    e = p.front();
+                                    p.pop();
+                                }
+                            else
+                             printf("0 ");
+                        }
+                        printf("\n");
+                    }
+                }
+                return true;
+            }
+            if(judge(tmp.x + dir[0][0], tmp.y + dir[0][1]))
+            {
+                e.x = tmp.x;
+                e.y = tmp.y;
+                e.direct = 0;
+                s.push(e);
+                e.x = tmp.x + dir[0][0];
+                e.y = tmp.y + dir[0][1];
+                visit[e.x][e.y] = 1;
+                s.push(e);
+            }
+            else if(judge(tmp.x + dir[1][0], tmp.y + dir[1][1]))
+            {
+                e.x = tmp.x;
+                e.y = tmp.y;
+                e.direct = 1;
+                s.push(e);
+                e.x = tmp.x + dir[1][0];
+                e.y = tmp.y + dir[1][1];
+                visit[e.x][e.y] = 1;
+                s.push(e);
+            }
+            else if(judge(tmp.x + dir[2][0],tmp.y + dir[2][1]))
+            {
+                e.x = tmp.x;
+                e.y = tmp.y;
+                e.direct = 2;
+                s.push(e);
+                e.x = tmp.x + dir[2][0];
+                e.y = tmp.y + dir[2][1];
+                visit[e.x][e.y] = 1;
+                s.push(e);
+            }
+            else if(judge(tmp.x + dir[3][0], tmp.y + dir[3][1]))
+            {
+                e.x = tmp.x;
+                e.y = tmp.y;
+                e.direct = 3;
+                s.push(e);
+                e.x = tmp.x + dir[3][0];
+                e.y = tmp.y + dir[3][1];
+                visit[e.x][e.y] = 1;
+                s.push(e);
+            }
+        }
+
+        printf("无可行路径！！！\n");
+        return false;
+    }
+    void show_map()//输出方阵迷宫
+    {
+        printf("方阵迷宫：\n");
+        for(int i = 1; i <= n; i ++)
+            for(int j = 1; j <= m; j ++)
+            {
+                printf("%d ", maplab[i][j]);
+                if (j == m)
+                    printf("\n");
+            }
+    }
+    void input_map()//自定义迷宫
+    {
+        printf("输入迷宫 %d %d \n", n, m);
+         for(int i = 1; i <= n; i ++)
+        {
+            for(int j = 1; j <= m; j ++)
+                {
+                    scanf("%d", &maplab[i][j]);
+                    if (i == n && j == m)
+                    {
+                        printf("输入完成！！！\n");
+                        break;
+                    }
+                }
+        }
+    }
+    void show_map_route()//输出方阵
+    {
+        Show_route(1);
+    }
+    void input_start(int x, int y)
+    {
+        start_x = x;
+        start_y = y;
+        printf("起点位置已输入（%d, %d）\n", start_x, start_y);
+    }//输入起始位置
+    void input_end(int x, int y)
+    {
+        end_x = x;
+        end_y = y;
+        printf("终点位置已输入（%d, %d） \n", end_x, end_y);
+    }//输入终点位置
+    void input_size(int x, int y)
+    {
+        n = x;
+        m = y;
+        printf("方阵维数已输入%d * %d \n", n, m);
+    }//输入迷宫维度
+
+};
+#endif // MIGONG_H_INCLUDED

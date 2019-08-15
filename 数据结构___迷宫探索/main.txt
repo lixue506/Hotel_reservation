@@ -1,0 +1,93 @@
+#include<iostream>
+#include<stdio.h>
+#include<stack>
+using namespace std;
+#include"migong.h"
+
+Migong web;
+
+bool show_detail()
+{
+    int c;
+    int x,y;
+    printf("**********迷宫问题求解**********\n");
+    printf("* 1.输入起点位置               *\n");
+    printf("* 2.输入终点位置               *\n");
+    printf("* 3.输入迷宫维度               *\n");
+    printf("* 4.输入方阵迷宫               *\n");
+    printf("* 5.输出方阵迷宫               *\n");
+    printf("* 6.输出路径                   *\n");
+    printf("* 7.输出方阵                   *\n");
+    printf("* 8.退出                       *\n");
+    printf("********************************\n");
+    printf("选择操作：\n");
+    scanf("%d", &c);
+    switch(c)
+    {
+    case 1:
+        {
+            scanf("%d%d", &x, &y);
+            web.input_start(x, y);
+            break;
+        }
+    case 2:
+        {
+            scanf("%d%d", &x, &y);
+            web.input_end(x, y);
+            break;
+        }
+    case 3:
+        {
+            scanf("%d%d", &x, &y);
+            web.input_size(x, y);
+            break;
+        }
+    case 4:
+        {
+            web.input_map();
+            break;
+        }
+    case 5:
+        {
+            web.show_map();
+            break;
+        }
+    case 6:
+        {
+            web.Show_route();
+            break;
+        }
+    case 7:
+        {
+            web.show_map_route();
+            break;
+        }
+    default:
+        return false;
+    }
+    return true;
+}
+
+bool start_style()
+{
+    char s;
+    printf("**********迷宫问题求解**********\n");
+    printf("* 进入程序                     *\n");
+    printf("* 退出                         *\n");
+    printf("********************************\n");
+    printf("按任意键进入程序，q退出程序：\n");
+    scanf("%c", &s);
+    while(s != 'q')
+    {
+        if( !show_detail())
+            break;
+    }
+    printf("Bye!!!");
+    return false;
+}
+
+int main()
+{
+    start_style();
+    return 0;
+}
